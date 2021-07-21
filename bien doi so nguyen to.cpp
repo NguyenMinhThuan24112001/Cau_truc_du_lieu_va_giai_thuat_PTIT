@@ -1,74 +1,70 @@
-#include<bits/stdc++.h>
+#include<iostream>
+#include<vector>
+#include<cmath>
+#include<queue>
 using namespace std;
-long long ngto[10001],s,t; 
-int nt(long long n){
-	for (int i=2;i<=sqrt(n);i++) if (n%i==0) return 0;
-	return 1;
-}
-void sang(){
-	for (long long i=1000;i<10001;i++)
-		if (nt(i)) ngto[i]=1;
-		else ngto[i]=0;
-}
-void Solu(){
-	long long chuaxet[10001], prev[10001], queue[10001];
-	long long in=-1, out= 0;
-	memset(chuaxet,1,sizeof(chuaxet));
-	memset(prev,0,sizeof(prev));
-	queue[++in]=s;
-	chuaxet[s]=0;
-	prev[s]=0;
-	while (in>=out){
-		long long ss=queue[out];
-		out++;
-		if (ss==t) break;
-		int s0=ss%10;ss/=10;
-		int s1=ss%10;ss/=10;
-		int s2=ss%10;ss/=10;
-		int s3=ss;
-		long long ts=s0+10*s1+100*s2;
-		for (int i=1;i<10;i++)
-			if (i!=s3&&ngto[ts+1000*i]&&chuaxet[ts+1000*i]){
-				queue[++in]=ts+1000*i;
-				chuaxet[ts+1000*i]=0;
-				prev[ts+1000*i]=ts+1000*s3;
+int m, n;
+vector<int> v;
+void fullPrime(){
+	bool B[10009];
+	for(int i=0; i<10009; i++) B[i] = true;
+	for(int i=2; i<10000; i++){
+		if(B[i]){
+			for(int j=2*i; j<10000; j+=i){
+				B[j] = false;
 			}
-		
-		ts=s0+10*s1+1000*s3;
-		for (int i=0;i<10;i++)
-			if (i!=s2&&ngto[ts+100*i]&&chuaxet[ts+100*i]){
-				queue[++in]=ts+100*i;
-				chuaxet[ts+100*i]=0;
-				prev[ts+100*i]=ts+100*s2;
-			}	
-		ts=s0+100*s2+1000*s3;
-		for (int i=0;i<10;i++)
-			if (i!=s1&&ngto[ts+10*i]&&chuaxet[ts+10*i]){
-				queue[++in]=ts+10*i;
-				chuaxet[ts+10*i]=0;
-				prev[ts+10*i]=ts+10*s1;
-			}
-		ts=10*s1+100*s2+1000*s3;
-		for (int i=0;i<10;i++)
-			if (i!=s0&&ngto[ts+i]&&chuaxet[ts+i]){
-				queue[++in]=ts+i;
-				chuaxet[ts+i]=0;
-				prev[ts+i]=ts+s0;
-			}
+		}
 	}
-	vector<int>res;
-	while (prev[t]>0){
-		res.push_back(t);
-		t=prev[t];
+	for(int i=1000; i<=9999; i++){
+		if(B[i]) v.push_back(i);
 	}
-	cout<<res.size()<<endl;
+}
+bool oneDigit(int a, int b){
+	int res = 0;
+	while(a > 0 && b > 0){
+		if(a % 10 != b % 10) res++;
+		a/=10; b/=10;
+	}
+	if(res == 1) return true;
+	return false;
 }
 int main(){
-	int test;
-	cin>>test;
-	sang();
-	while (test--){
-		cin>>s>>t;
-		Solu();
+	fullPrime();
+	int test; cin >> test;
+	while(test--){
+		cin >> m >> n;
+		if(m == n){
+			cout << 0 << endl;
+			continue;
+		}
+		queue<int> q;
+		int B[v.size() + 9];
+		for(int i=0; i<v.size() + 9; i++) B[i] = 0;
+		q.push(m);
+		int count = 0;
+		bool check = false;
+		while(!check){
+			count++;
+			int t = 0, len = q.size();
+			while(t < len){
+				bool rt = false;
+				int tmp = q.front(); q.pop();
+				for(int i=0; i<v.size(); i++){
+					if(B[i] == 0){
+						if(oneDigit(v.at(i), tmp)){
+							B[i] = 1; q.push(v.at(i));
+							if(v.at(i) == n){
+								check = true;
+								rt = true;
+								break;
+							}
+						}
+					}
+				}
+				if(rt) break;
+				t++;
+			}
+		}
+		cout << count << endl;
 	}
 }
